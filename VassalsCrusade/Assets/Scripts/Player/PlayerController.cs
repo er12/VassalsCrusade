@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PlayerAttackingMode{
-    
+public enum PlayerCursorMode
+{
+
     Physical,
     Magical,
     Off
@@ -13,9 +14,15 @@ public enum PlayerAttackingMode{
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 5f;
+    public float maxHealth = 100f;
+    public float currentHealth;
+    public float maxCosmic = 100f;
+    public float currentCosmic;
+    bool startedGainingCosmicPeriodically;
+    public StatusBarController statusBar;
 
-    public PlayerAttackingMode playerAttackingMode;
 
+    [SerializeField]
     private PlayerBaseState currentState;
     public PlayerBaseState CurrentState
     {
@@ -32,8 +39,8 @@ public class PlayerController : MonoBehaviour
         get { return rb; }
     }
 
-    private Animator animator;
-    public Animator Animator { get => animator;}
+    [HideInInspector]
+    public Animator animator;
 
     static bool playerExists;
 
@@ -41,10 +48,18 @@ public class PlayerController : MonoBehaviour
     List<string> availableAttacks;
     public string CurrentAttack { get; set; }
 
+
+    public PlayerCursorMode playerCursorMode;
+    public delegate void CursorChange(PlayerCursorMode pam);
+    public static event CursorChange CombatChange;
+
+    public delegate void PlayerStatus(float value);
+    public static event PlayerStatus CosmicUpdate;
+
     // Start is called before the first frame update
     void Start()
     {
-        if(!playerExists)
+        if (!playerExists)
         {
             playerExists = true;
             DontDestroyOnLoad(transform.gameObject);
@@ -57,14 +72,21 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
 
-        playerAttackingMode = PlayerAttackingMode.Physical;
+        playerCursorMode = PlayerCursorMode.Physical;
 
-        availableAttacks= new List<string>()
+        availableAttacks = new List<string>()
         {
             "Slash"
-        }
-        ;
+        };
         CurrentAttack = "";
+
+        // Status Bar
+        currentHealth = maxHealth;
+        currentCosmic = maxCosmic;
+        FindObjectOfType<StatusBarController>().SetMaxHealth(maxHealth);
+        FindObjectOfType<StatusBarController>().SetMaxCosmic(maxCosmic);
+
+
 
         TransitionToState(WalkingState);
     }
@@ -74,11 +96,16 @@ public class PlayerController : MonoBehaviour
         currentState.Update(this);
 
         // If not on dialogue can changue attack mode
-        if(Input.GetKeyDown(KeyCode.Space) && 
+        if (Input.GetKeyDown(KeyCode.Space) &&
             !GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Dialogue"))
         {
-            animator.GetComponent<PlayerController>().ToogleAtackingMode();
+            ToogleAtackingMode();
+            CombatChange?.Invoke(playerCursorMode);
+        }
 
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            TakeDamage(20);
         }
     }
 
@@ -93,25 +120,55 @@ public class PlayerController : MonoBehaviour
         currentState.EnterState(this);
     }
 
+
     public void ToogleAtackingMode()
     {
-        switch(playerAttackingMode)
+        switch (playerCursorMode)
         {
-            case PlayerAttackingMode.Physical:
-            {
-                playerAttackingMode = PlayerAttackingMode.Magical;
-                transform.Find("AttackPoint").gameObject.SetActive(false);
-                transform.Find("MagicPoint").gameObject.SetActive(true);
-                break;
-            }
-            case PlayerAttackingMode.Magical:
-            {
-                playerAttackingMode = PlayerAttackingMode.Physical;
-                transform.Find("AttackPoint").gameObject.SetActive(true);
-                transform.Find("MagicPoint").gameObject.SetActive(false);
-                break;
-            }
-            default: break;
+            case PlayerCursorMode.Physical:
+                {
+                    playerCursorMode = PlayerCursorMode.Magical;
+                    break;
+                }
+            case PlayerCursorMode.Magical:
+                {
+                    playerCursorMode = PlayerCursorMode.Physical;
+                    break;
+                }
+            default: break; //Maybe dialogue or menu
         }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        currentHealth -= damage;
+        statusBar.SetHealth(currentHealth);
+    }
+    public void TakeCosmic(float cosmic)
+    {
+        currentCosmic -= cosmic;
+        CosmicUpdate?.Invoke(currentCosmic);
+
+        if (!startedGainingCosmicPeriodically)
+        {
+            startedGainingCosmicPeriodically = true;
+            StartCoroutine(GainCosmicPeriodically());
+        }
+    }
+
+    public void GainCosmic(float cosmic)
+    {
+        currentCosmic += cosmic;
+        CosmicUpdate?.Invoke(currentCosmic);
+    }
+
+    IEnumerator GainCosmicPeriodically()
+    {
+        while (currentCosmic < maxCosmic)
+        {
+            GainCosmic(5f);
+            yield return new WaitForSeconds(1f);
+        }
+        startedGainingCosmicPeriodically = false;
     }
 }

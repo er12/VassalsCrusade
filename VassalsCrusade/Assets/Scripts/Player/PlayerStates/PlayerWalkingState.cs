@@ -19,15 +19,15 @@ public class PlayerMovingState : PlayerBaseState
 
         if (movement != Vector2.zero)
         {
-            player.Animator.SetFloat("Horizontal", movement.x);
-            player.Animator.SetFloat("Vertical", movement.y);
-            player.Animator.SetFloat("Speed", movement.sqrMagnitude);
-            player.Animator.SetBool("Walking", true);
+            player.animator.SetFloat("Horizontal", movement.x);
+            player.animator.SetFloat("Vertical", movement.y);
+            player.animator.SetFloat("Speed", movement.sqrMagnitude);
+            player.animator.SetBool("Walking", true);
 
         }
         else
         {
-            player.Animator.SetBool("Walking", false);
+            player.animator.SetBool("Walking", false);
         }
 
 

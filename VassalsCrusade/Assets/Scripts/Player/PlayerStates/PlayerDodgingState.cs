@@ -12,7 +12,7 @@ public class PlayerDodgingState : PlayerBaseState
         dodgeDirection = player.WalkingState.Movement;
         dodgeSpeed = 35f;
 
-        player.Animator.SetBool("Dodging", true);
+        player.animator.SetBool("Dodging", true);
     }
 
     public override void Update(PlayerController player)
@@ -26,7 +26,7 @@ public class PlayerDodgingState : PlayerBaseState
         //Finished dodgeing
         if (dodgeSpeed < dodgeSpeedMinimun)
         {
-            player.Animator.SetBool("Dodging", false);
+            player.animator.SetBool("Dodging", false);
             player.TransitionToState(player.WalkingState);
         }
 

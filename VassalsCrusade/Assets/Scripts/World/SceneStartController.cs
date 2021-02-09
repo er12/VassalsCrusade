@@ -24,12 +24,6 @@ public class SceneStartController : MonoBehaviour
         //Stop illusion
         player.GetComponent<Animator>().enabled = true;
         player.GetComponent<PlayerController>().enabled = true;
-
-
-
-        //player.animator.SetFloat("Horizontal", transform.position.x);
-        //player.animator.SetFloat("Vertical", transform.position.y);
-
     }
 
     // Update is called once per frame

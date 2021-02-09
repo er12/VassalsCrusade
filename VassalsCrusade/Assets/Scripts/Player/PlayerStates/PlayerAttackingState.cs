@@ -5,68 +5,63 @@ using UnityEngine;
 public class PlayerAttackingState : PlayerBaseState
 {
     public PlayerController player;
-
     private Vector2 movement;
     public Vector2 Movement { get { return movement; } }
 
-    public float slashMoveVelocity = 4f;
+    public float attackStepVelocity = 4f;
     Vector3 slashDirection;
 
+    Vector3 mousePosition;
+    Vector3 posDif;
+    public CombatController combatController;
 
-
-    public CombatController shortRangeAttack;
 
     public override void EnterState(PlayerController player)
     {
         this.player = player;
+        combatController = player.GetComponent<CombatController>();
 
-        shortRangeAttack = player.GetComponent<CombatController>();
 
-        slashMoveVelocity = 4f;
-        slashDirection = player.WalkingState.Movement;
+        mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        posDif = mousePosition - player.transform.position;
 
-        //Play animation
-        player.Animator.SetTrigger("Attack");
-        Attack(player.CurrentAttack);
+        slashDirection = posDif;
+
+        player.animator.SetTrigger("Attack");
+        player.animator.SetFloat("Mouse Horizontal", posDif.x);
+        player.animator.SetFloat("Mouse Vertical", posDif.y);
+        if (player.playerCursorMode == PlayerCursorMode.Physical)
+        {
+            //Play animation
+            combatController.Attack(player.CurrentAttack, player.currentCosmic);
+        }
+        else if (player.playerCursorMode == PlayerCursorMode.Magical)
+        {
+            combatController.Attack("Typhoon", player.currentCosmic);
+        }
+        else
+        {
+            player.TransitionToState(player.WalkingState);
+        }
+
 
     }
 
     public override void Update(PlayerController player)
     {
 
-       //Transition back to walking
-       if (!checkIsAttacking(player.Animator))
+        // TODO: maybe USE animations EVENTS to fix this , note it has 4 animations
+        //Transition back to walking
+        if (player.animator.GetCurrentAnimatorStateInfo(0).IsName("Player_Attack"))
             player.TransitionToState(player.WalkingState);
     }
 
     public override void FixUpdate(PlayerController player)
     {
-        
-        // If slash, move a litte forward
-        player.Rigidbody.velocity = slashDirection * slashMoveVelocity;
+        // If attack, move a litte forward
+        player.Rigidbody.velocity = posDif.normalized * attackStepVelocity;
     }
 
 
-    // TODO: USE EVENTS to fix this , note it has 4 animations
-    public bool checkIsAttacking(Animator anim)
-    {
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Player_Attack"))
-        {
-            return true;
-        }
-        return false;
-    }
 
-    void Attack(string attack)
-    {
-
-        switch (attack)
-        {
-            case "Slash":
-                shortRangeAttack.SpawnSlash();
-                break;
-            default:
-                break;
-        }
-    }
 }
