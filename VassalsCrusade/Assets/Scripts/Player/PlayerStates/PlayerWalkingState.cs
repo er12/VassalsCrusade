@@ -23,15 +23,13 @@ public class PlayerMovingState : PlayerBaseState
             player.animator.SetFloat("Vertical", movement.y);
             player.animator.SetFloat("Speed", movement.sqrMagnitude);
             player.animator.SetBool("Walking", true);
-
         }
         else
-        {
             player.animator.SetBool("Walking", false);
-        }
 
 
-        // TODO TBD: make dodge only when running 
+
+        // Dodge only when running 
         if (Input.GetMouseButtonDown(1) && movement.magnitude != 0)
         {
             player.TransitionToState(player.DodgingState);
@@ -39,7 +37,6 @@ public class PlayerMovingState : PlayerBaseState
 
         if (Input.GetMouseButtonDown(0))
         {
-            player.CurrentAttack = "Slash";
             player.TransitionToState(player.AttackingState);
         }
     }

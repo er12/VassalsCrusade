@@ -2,14 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PlayerCursorMode
-{
 
-    Physical,
-    Magical,
-    Off
-
-}
 
 public class PlayerController : MonoBehaviour
 {
@@ -19,7 +12,6 @@ public class PlayerController : MonoBehaviour
     public float maxCosmic = 100f;
     public float currentCosmic;
     bool startedGainingCosmicPeriodically;
-    public StatusBarController statusBar;
 
 
     [SerializeField]
@@ -44,17 +36,10 @@ public class PlayerController : MonoBehaviour
 
     static bool playerExists;
 
-
-    List<string> availableAttacks;
-    public string CurrentAttack { get; set; }
-
-
-    public PlayerCursorMode playerCursorMode;
-    public delegate void CursorChange(PlayerCursorMode pam);
-    public static event CursorChange CombatChange;
-
     public delegate void PlayerStatus(float value);
     public static event PlayerStatus CosmicUpdate;
+    public static event PlayerStatus HealthUpdate;
+
 
     // Start is called before the first frame update
     void Start()
@@ -65,20 +50,10 @@ public class PlayerController : MonoBehaviour
             DontDestroyOnLoad(transform.gameObject);
         }
         else
-        {
             Destroy(gameObject);
-        }
 
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
-
-        playerCursorMode = PlayerCursorMode.Physical;
-
-        availableAttacks = new List<string>()
-        {
-            "Slash"
-        };
-        CurrentAttack = "";
 
         // Status Bar
         currentHealth = maxHealth;
@@ -86,22 +61,15 @@ public class PlayerController : MonoBehaviour
         FindObjectOfType<StatusBarController>().SetMaxHealth(maxHealth);
         FindObjectOfType<StatusBarController>().SetMaxCosmic(maxCosmic);
 
-
-
         TransitionToState(WalkingState);
     }
 
     void Update()
     {
-        currentState.Update(this);
+        currentState?.Update(this);
 
-        // If not on dialogue can changue attack mode
-        if (Input.GetKeyDown(KeyCode.Space) &&
-            !GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Dialogue"))
-        {
-            ToogleAtackingMode();
-            CombatChange?.Invoke(playerCursorMode);
-        }
+        if (CurrentState == null)
+            TransitionToState(WalkingState);
 
         if (Input.GetKeyDown(KeyCode.X))
         {
@@ -111,7 +79,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        currentState.FixUpdate(this);
+        currentState?.FixUpdate(this);
     }
 
     public void TransitionToState(PlayerBaseState state)
@@ -120,29 +88,10 @@ public class PlayerController : MonoBehaviour
         currentState.EnterState(this);
     }
 
-
-    public void ToogleAtackingMode()
-    {
-        switch (playerCursorMode)
-        {
-            case PlayerCursorMode.Physical:
-                {
-                    playerCursorMode = PlayerCursorMode.Magical;
-                    break;
-                }
-            case PlayerCursorMode.Magical:
-                {
-                    playerCursorMode = PlayerCursorMode.Physical;
-                    break;
-                }
-            default: break; //Maybe dialogue or menu
-        }
-    }
-
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
-        statusBar.SetHealth(currentHealth);
+        HealthUpdate?.Invoke(currentHealth);
     }
     public void TakeCosmic(float cosmic)
     {

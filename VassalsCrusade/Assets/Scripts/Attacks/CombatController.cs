@@ -1,12 +1,20 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum AttackType
+{
+
+    Physical,
+    Magical,
+    Off
+
+}
+
 public class CombatController : MonoBehaviour
 {
-    public GameObject slashPrefab;
-    public GameObject typhoonPrefab;
-    AttackPointController attackPoint;
+    Transform attackPoint;
     float angle;
     float distance = 2;
 
@@ -15,23 +23,55 @@ public class CombatController : MonoBehaviour
     public Texture2D characterAttackCursor;
     public Texture2D characterMagicCursor;
     public Texture2D characterHandORSomethingCursor;// For menus? NPC talk?
-    public Camera myCamera;
 
     PlayerController playerController;
 
+    public delegate void CursorChange(AttackType pam);
+    public static event CursorChange CombatChange;
+
+    public AttackType attackStance;
+
+    public AttackScriptableObject[] attacksArsenal;
+
+    [HideInInspector]
+    public string currentAttack;
+    string lastPhysicalAttack;
+    string lastMagicAttack;
+
+
     void Start()
     {
-        playerController = GetComponent<PlayerController>();
-        attackPoint = transform.Find("AttackPoint").GetComponent<AttackPointController>();
+        attackStance = AttackType.Physical;
 
+        playerController = GetComponent<PlayerController>();
+        attackPoint = transform.Find("AttackPoint");
+
+
+        foreach (AttackScriptableObject aso in attacksArsenal)
+        {
+
+        }
+        currentAttack = attacksArsenal[0].attackName; //slash 
+        lastPhysicalAttack = currentAttack;
+        lastMagicAttack = attacksArsenal[1].attackName; //typhoon
+
+    }
+
+    void Update()
+    {
+        // If not on dialogue can changue attack mode
+        if (Input.GetKeyDown(KeyCode.Space) &&
+            !GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Dialogue"))
+        {
+            ToogleAtackingMode();
+            CombatChange?.Invoke(attackStance);
+        }
     }
 
     void FixedUpdate()
     {
         // For attack point
-        mousePos = Input.mousePosition;
-        mousePos = Camera.main.ScreenToWorldPoint(mousePos);
-
+        mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos -= transform.position;
 
         angle = Mathf.Atan2(mousePos.y, mousePos.x) * Mathf.Rad2Deg;
@@ -43,41 +83,56 @@ public class CombatController : MonoBehaviour
         float xPos = Mathf.Cos(Mathf.Deg2Rad * angle) * distance;
         float yPos = Mathf.Sin(Mathf.Deg2Rad * angle) * distance;
 
-        attackPoint.transform.localPosition = new Vector3(xPos, yPos, 0);
+        attackPoint.localPosition = new Vector3(xPos, yPos, 0);
     }
 
 
     public void Attack(string attack, float cosmic)
     {
-        // TO DO: Change to scriptable object or something more fancy
-        // And better use of slash prefabs
+        AttackScriptableObject aso = Array.Find(attacksArsenal, attackInArsenal => attackInArsenal.attackName == attack);
+
+        if (aso == null)
+        {
+            Debug.Log("Attack Not Found");
+            return;
+        }
+
+        //Ways to instantiate attacks
         switch (attack)
         {
             case "Slash":
-                SpawnSlash();
+                Instantiate(aso.prefab, attackPoint.position, Quaternion.Euler(new Vector3(0, 0, angle)));
                 break;
             case "Typhoon":
                 if (cosmic >= 10)
                 {
                     playerController.TakeCosmic(10);
-                    SpawnTyphoon();
+                    Instantiate(aso.prefab, transform.position, transform.rotation);
                 }
                 break;
             default:
                 break;
-
         }
 
     }
 
-    public void SpawnSlash()
+    public void ToogleAtackingMode()
     {
-        Instantiate(slashPrefab, attackPoint.transform.position, Quaternion.Euler(new Vector3(0, 0, angle)));
+        switch (attackStance)
+        {
+            case AttackType.Physical:
+                {
+                    attackStance = AttackType.Magical;
+                    currentAttack = lastMagicAttack;
+                    break;
+                }
+            case AttackType.Magical:
+                {
+                    attackStance = AttackType.Physical;
+                    currentAttack = lastPhysicalAttack;
+                    break;
+                }
+            default: break; //Maybe dialogue or menu
+        }
     }
-
-    public void SpawnTyphoon()
-    {
-        Instantiate(typhoonPrefab, transform.position, transform.rotation);
-    }
-
 }

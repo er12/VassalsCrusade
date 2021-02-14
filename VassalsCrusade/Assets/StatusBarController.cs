@@ -12,11 +12,13 @@ public class StatusBarController : MonoBehaviour
     void OnEnable()
     {
         PlayerController.CosmicUpdate += SetCosmic;
+        PlayerController.HealthUpdate += SetHealth;
     }
 
     void OnDisable()
     {
         PlayerController.CosmicUpdate -= SetCosmic;
+        PlayerController.HealthUpdate -= SetHealth;
     }
 
     public void SetHealth(float health)

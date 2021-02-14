@@ -7,9 +7,9 @@ public class CursorController : MonoBehaviour
     Vector3 mousePosition;
     SpriteRenderer spriteRenderer;
 
-    public Transform player; 
+    public Transform player;
     Texture2D currentPlayerCursorMagicSprite;
-    Texture2D currentPlayerCursorAttackSprite;     
+    Texture2D currentPlayerCursorAttackSprite;
 
     public Texture2D cursorTexture;
     public CursorMode cursorMode = CursorMode.Auto;
@@ -18,49 +18,49 @@ public class CursorController : MonoBehaviour
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        SetCursorMode(FindObjectOfType<PlayerController>().playerCursorMode);
-
+        SetCursorMode(FindObjectOfType<PlayerController>().GetComponent<CombatController>().attackStance);
         LoadPlayerCursors();
     }
 
-    // TO DO: CHange Ziv and zenon
+    // TODO: Change Ziv and zenon
     void LoadPlayerCursors()
     {
+        // This has to be called like this for when switching characters
         CombatController cc = FindObjectOfType<PlayerController>().GetComponent<CombatController>();
 
         currentPlayerCursorAttackSprite = cc.characterAttackCursor;
-        currentPlayerCursorMagicSprite = cc.characterMagicCursor;        
+        currentPlayerCursorMagicSprite = cc.characterMagicCursor;
         //For current spritesheet 
         spriteRenderer.flipY = true;
     }
 
-    void SetCursorMode(PlayerCursorMode playerCursorMode)
+    void SetCursorMode(AttackType playerCursorMode)
     {
-        switch(playerCursorMode)
+        switch (playerCursorMode)
         {
-            case PlayerCursorMode.Physical:
-            {
-                Cursor.SetCursor(currentPlayerCursorAttackSprite, hotSpot,cursorMode);
-                break;
-            }
-            case PlayerCursorMode.Magical:
-            {
-                Cursor.SetCursor(currentPlayerCursorMagicSprite, hotSpot,cursorMode);
-                break;
-            }
+            case AttackType.Physical:
+                {
+                    Cursor.SetCursor(currentPlayerCursorAttackSprite, hotSpot, cursorMode);
+                    break;
+                }
+            case AttackType.Magical:
+                {
+                    Cursor.SetCursor(currentPlayerCursorMagicSprite, hotSpot, cursorMode);
+                    break;
+                }
             default: break; //Maybe dialogue or menu
         }
     }
 
-    
+
     void OnEnable()
     {
-        PlayerController.CombatChange += SetCursorMode;
+        CombatController.CombatChange += SetCursorMode;
     }
 
 
     void OnDisable()
     {
-        PlayerController.CombatChange -= SetCursorMode;
+        CombatController.CombatChange -= SetCursorMode;
     }
 }

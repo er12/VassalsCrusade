@@ -5529,18 +5529,6 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 2775517425096005972}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &771770607 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2775517425398010299, guid: 222f25e5144847841ac99265282edd0d,
-    type: 3}
-  m_PrefabInstance: {fileID: 2775517425096005972}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8b076f8f084acb4b89d6e1a5d33124f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &783515630
 GameObject:
   m_ObjectHideFlags: 3
@@ -10434,6 +10422,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Typhoon
+      objectReference: {fileID: 0}
+    - target: {fileID: 6612888649748774510, guid: 0cbbc8c9ad4a3084ab31c74889b98a63,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0cbbc8c9ad4a3084ab31c74889b98a63, type: 3}
@@ -16093,19 +16086,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 649220741, guid: 92d9622b2c9cf0541a05a073dbefc03a, type: 3}
-      propertyPath: myCamera
-      value: 
-      objectReference: {fileID: 1451288633}
-    - target: {fileID: 649220741, guid: 92d9622b2c9cf0541a05a073dbefc03a, type: 3}
-      propertyPath: typhoonPrefab
-      value: 
-      objectReference: {fileID: 6612888649748774510, guid: 0cbbc8c9ad4a3084ab31c74889b98a63,
-        type: 3}
-    - target: {fileID: 649220741, guid: 92d9622b2c9cf0541a05a073dbefc03a, type: 3}
-      propertyPath: characterMagicCursor
-      value: 
-      objectReference: {fileID: 2800000, guid: b68d44b3b7ef0b04bac51c0c97f68ae1, type: 3}
     - target: {fileID: 312252623559802850, guid: 92d9622b2c9cf0541a05a073dbefc03a,
         type: 3}
       propertyPath: m_RootOrder
@@ -16161,11 +16141,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 312252624056310272, guid: 92d9622b2c9cf0541a05a073dbefc03a,
-        type: 3}
-      propertyPath: statusBar
-      value: 
-      objectReference: {fileID: 771770607}
     - target: {fileID: 312252624056310287, guid: 92d9622b2c9cf0541a05a073dbefc03a,
         type: 3}
       propertyPath: m_Name
@@ -71200,7 +71175,7 @@ PrefabInstance:
     - target: {fileID: 7147880257718886217, guid: 1048c310e14410d44838796ae8f7b4bc,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.4305515
+      value: 6.4186964
       objectReference: {fileID: 0}
     - target: {fileID: 7147880257718886217, guid: 1048c310e14410d44838796ae8f7b4bc,
         type: 3}
@@ -71220,7 +71195,7 @@ PrefabInstance:
     - target: {fileID: 7147880258015946014, guid: 1048c310e14410d44838796ae8f7b4bc,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.4305515
+      value: 6.4186964
       objectReference: {fileID: 0}
     - target: {fileID: 7147880258015946014, guid: 1048c310e14410d44838796ae8f7b4bc,
         type: 3}

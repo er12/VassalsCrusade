@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32359c123fe85a34aaeb27793b7062e5, type: 3}
+  m_Name: TyphoonSO
+  m_EditorClassIdentifier: 
+  attackName: Typhoon
+  prefab: {fileID: 6612888649748774510, guid: 0cbbc8c9ad4a3084ab31c74889b98a63, type: 3}
+  attackBehaviourTrigger: 0
