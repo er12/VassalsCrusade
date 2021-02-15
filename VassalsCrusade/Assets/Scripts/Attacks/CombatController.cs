@@ -31,12 +31,19 @@ public class CombatController : MonoBehaviour
 
     public AttackType attackStance;
 
-    public AttackScriptableObject[] attacksArsenal;
+    public AttackScriptableObject physicalAttack;
+    public AttackScriptableObject[] magicAttacksArsenal;
 
     [HideInInspector]
     public string currentAttack;
     string lastPhysicalAttack;
     string lastMagicAttack;
+
+    MagicMenu magicMenu;
+    float spaceHoldTimer;
+    bool spaceHold;
+    bool showingMagicMenu;
+    bool isSinglePress;
 
 
     void Start()
@@ -47,24 +54,53 @@ public class CombatController : MonoBehaviour
         attackPoint = transform.Find("AttackPoint");
 
 
-        foreach (AttackScriptableObject aso in attacksArsenal)
+        foreach (AttackScriptableObject aso in magicAttacksArsenal)
         {
 
         }
-        currentAttack = attacksArsenal[0].attackName; //slash 
+        currentAttack = magicAttacksArsenal[0].attackName; //typhoon 
         lastPhysicalAttack = currentAttack;
-        lastMagicAttack = attacksArsenal[1].attackName; //typhoon
+
+        magicMenu = FindObjectOfType<MagicMenu>();
+        magicMenu.gameObject.SetActive(false);
+        spaceHoldTimer = 0;
 
     }
 
     void Update()
     {
-        // If not on dialogue can changue attack mode
-        if (Input.GetKeyDown(KeyCode.Space) &&
-            !GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Dialogue"))
+        //TODO: disable combat controller on dialogue
+
+        //Magic menu legic, to make it appear when on hold and just change attack mode on single press
+        spaceHold = Input.GetKey(KeyCode.Space);
+
+        if (!spaceHold && isSinglePress && !showingMagicMenu)
         {
             ToogleAtackingMode();
             CombatChange?.Invoke(attackStance);
+        }
+
+        isSinglePress = spaceHold; // record for next frame
+
+        if (spaceHold)
+        {
+            spaceHoldTimer += Time.deltaTime;
+
+            if (spaceHoldTimer > 0.5f && !showingMagicMenu)
+            {
+                showingMagicMenu = true;
+                magicMenu.ToogleMagicMenu();
+            }
+        }
+        else
+        {
+            spaceHoldTimer = 0;
+            if (showingMagicMenu)
+            {
+                spaceHoldTimer = 0;
+                magicMenu.ToogleMagicMenu();
+                showingMagicMenu = false;
+            }
         }
     }
 
@@ -89,20 +125,25 @@ public class CombatController : MonoBehaviour
 
     public void Attack(string attack, float cosmic)
     {
-        AttackScriptableObject aso = Array.Find(attacksArsenal, attackInArsenal => attackInArsenal.attackName == attack);
-
-        if (aso == null)
+        if (attackStance == AttackType.Physical)
         {
-            Debug.Log("Attack Not Found");
+            // make more physical attacks
+            Instantiate(physicalAttack.prefab, attackPoint.position, Quaternion.Euler(new Vector3(0, 0, angle)));
             return;
         }
 
-        //Ways to instantiate attacks
+        AttackScriptableObject aso = Array.Find(magicAttacksArsenal, attackInArsenal => attackInArsenal.attackName == attack);
+
+        if (aso == null)
+        {
+            Debug.Log("Magic Not Found");
+            return;
+        }
+
+        //Ways to instantiate magic
+
         switch (attack)
         {
-            case "Slash":
-                Instantiate(aso.prefab, attackPoint.position, Quaternion.Euler(new Vector3(0, 0, angle)));
-                break;
             case "Typhoon":
                 if (cosmic >= 10)
                 {

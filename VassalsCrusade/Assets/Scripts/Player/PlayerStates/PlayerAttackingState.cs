@@ -47,7 +47,7 @@ public class PlayerAttackingState : PlayerBaseState
         // TODO: maybe USE animations EVENTS to fix this , note it has 4 animations
         //Transition back to walking if not attacking 
         if (!player.animator.GetCurrentAnimatorStateInfo(0).IsName("Player_Attack"))
-            player.TransitionToState(player.WalkingState);
+            player.TransitionToState(player.IdleState);
     }
 
     public override void FixUpdate(PlayerController player)

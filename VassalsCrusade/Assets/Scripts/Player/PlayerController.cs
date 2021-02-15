@@ -13,8 +13,6 @@ public class PlayerController : MonoBehaviour
     public float currentCosmic;
     bool startedGainingCosmicPeriodically;
 
-
-    [SerializeField]
     private PlayerBaseState currentState;
     public PlayerBaseState CurrentState
     {
@@ -68,13 +66,8 @@ public class PlayerController : MonoBehaviour
     {
         currentState?.Update(this);
 
-        if (CurrentState == null)
+        if (CurrentState == null) // For when reloading unity
             TransitionToState(WalkingState);
-
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            TakeDamage(20);
-        }
     }
 
     void FixedUpdate()
@@ -116,7 +109,7 @@ public class PlayerController : MonoBehaviour
         while (currentCosmic < maxCosmic)
         {
             GainCosmic(5f);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1f);// Each second
         }
         startedGainingCosmicPeriodically = false;
     }

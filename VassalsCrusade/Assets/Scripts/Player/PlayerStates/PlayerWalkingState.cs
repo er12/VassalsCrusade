@@ -25,7 +25,10 @@ public class PlayerMovingState : PlayerBaseState
             player.animator.SetBool("Walking", true);
         }
         else
+        {
             player.animator.SetBool("Walking", false);
+            player.TransitionToState(player.IdleState);
+        }
 
 
 
