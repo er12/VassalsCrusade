@@ -40,6 +40,7 @@ public class PlayerMovingState : PlayerBaseState
 
         if (Input.GetMouseButtonDown(0))
         {
+            player.animator.SetBool("Walking", false);
             player.TransitionToState(player.AttackingState);
         }
     }

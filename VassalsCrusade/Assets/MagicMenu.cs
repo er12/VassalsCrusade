@@ -11,16 +11,20 @@ public class MagicMenu : MonoBehaviour
     public bool showMagicMenu;
 
     CombatController combatController;
-    List<AttackScriptableObject> availableMagicAttacks;
 
     float radious = 3.2f;//for circle of scale 25 -> 3.2 works good
 
-    void Start()
-    {
-        combatController = FindObjectOfType<PlayerController>().GetComponent<CombatController>();
-        showMagicMenu = false;
+    List<MenuButton> menuButtonList;
 
-        availableMagicAttacks = new List<AttackScriptableObject>();
+    public delegate void MagicChange(string name);
+    public static event MagicChange MagicSelected;
+
+    string selectedMagic;
+
+    public void Start()
+    {
+        showMagicMenu = false;
+        combatController = FindObjectOfType<PlayerController>().GetComponent<CombatController>();
 
         int magicCount = combatController.magicAttacksArsenal.Length;
         float anglePlacement = 360 / magicCount;
@@ -28,9 +32,12 @@ public class MagicMenu : MonoBehaviour
         int i = 0;
         float x, y;
 
+        menuButtonList = new List<MenuButton>();
+
         foreach (AttackScriptableObject magicAttack in combatController.magicAttacksArsenal)
         {
-            float rad = Mathf.Deg2Rad * (anglePlacement * i);
+            float angle = (anglePlacement * i);
+            float rad = Mathf.Deg2Rad * angle;
 
             x = radious * Mathf.Cos(rad);
             y = radious * Mathf.Sin(rad);
@@ -38,22 +45,52 @@ public class MagicMenu : MonoBehaviour
             x = float.Parse(x.ToString("F4")); // could use tryparse
             y = float.Parse(y.ToString("F4"));
 
-
-
             GameObject menuItem = Instantiate(menuItemPrefab, transform);
             menuItem.GetComponent<RectTransform>().anchoredPosition = new Vector3(x, y, 0);
-            menuItem.transform.Find("Label").GetComponent<Text>().text = magicAttack.attackName + " " + i;
+            menuItem.transform.Find("Label").GetComponent<Text>().text = magicAttack.attackName;
 
-            // use class
+            // Set range of buttons in menu
+            /*
+                x = 0, n = 1 -> range = +- 360/2 on angle , upper = 180, lower = 180
+                x = 0, n = 2 -> range = +-360/4 on angle , upper = 90, lower = 270
+            */
+            float segmentButtonSideSize = (360 / (magicCount * 2));
+            MenuButton mb = new MenuButton()
+            {
+                name = magicAttack.attackName,
+                buttonGameObject = menuItem,
+                middleAngle = angle,
+                segmentSize = segmentButtonSideSize,
+            };
 
-
-            //availableMagicAttacks.Add(magicAttack);
+            menuButtonList.Add(mb);
 
             i++;
         }
+        gameObject.SetActive(false);
+    }
+    void Update()
+    {
+        float cursorAngle = normalizeAngle(combatController.angle);
+        foreach (MenuButton item in menuButtonList)
+        {
+            SpriteRenderer sr = item.buttonGameObject.GetComponent<SpriteRenderer>();
 
-        // TODO QUE SEYO
+            //https://stackoverflow.com/questions/12234574/calculating-if-an-angle-is-between-two-angles
+            float anglediff = (cursorAngle - item.middleAngle + 180 + 360) % 360 - 180;
 
+            if (anglediff <= item.segmentSize && anglediff >= -item.segmentSize)
+            {
+                item.buttonGameObject.GetComponent<SpriteRenderer>().color =
+                    new Color(sr.color.r, sr.color.g, sr.color.b, 255);
+                selectedMagic = item.name;
+            }
+            else
+            {
+                item.buttonGameObject.GetComponent<SpriteRenderer>().color =
+                    new Color(sr.color.r, sr.color.g, sr.color.b, 0);
+            }
+        }
     }
 
     void LateUpdate()
@@ -63,12 +100,31 @@ public class MagicMenu : MonoBehaviour
 
     public void ToogleMagicMenu()
     {
+        if (showMagicMenu)
+        {
+            MagicSelected?.Invoke(selectedMagic);
+        }
         showMagicMenu = !showMagicMenu;
 
         transform.position = combatController.transform.position;
 
         gameObject.SetActive(showMagicMenu);
 
+    }
+
+    void SetUp()
+    {
+
+    }
+
+    float normalizeAngle(float angle)
+    {
+        if (angle < 0.0f)
+        {
+            angle += 360;
+            return angle;
+        }
+        return angle % 360;
     }
 }
 
@@ -80,5 +136,10 @@ public class MenuButton
     public Color normalColor = Color.white;
     public Color highlightedColor = Color.grey;
     public Color pressedColor = Color.blue;
+
+    public GameObject buttonGameObject;
+    public float middleAngle;
+
+    public float segmentSize;
 
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public enum AttackType
@@ -8,17 +6,20 @@ public enum AttackType
 
     Physical,
     Magical,
-    Off
+    Status
 
 }
 
 public class CombatController : MonoBehaviour
 {
     Transform attackPoint;
-    float angle;
+
+    public float angle;
     float distance = 2;
 
     Vector3 mousePos;
+    [HideInInspector]
+    public Vector3 directionVector;
 
     public Texture2D characterAttackCursor;
     public Texture2D characterMagicCursor;
@@ -33,11 +34,7 @@ public class CombatController : MonoBehaviour
 
     public AttackScriptableObject physicalAttack;
     public AttackScriptableObject[] magicAttacksArsenal;
-
-    [HideInInspector]
-    public string currentAttack;
-    string lastPhysicalAttack;
-    string lastMagicAttack;
+    string currentMagicAttack;
 
     MagicMenu magicMenu;
     float spaceHoldTimer;
@@ -53,16 +50,10 @@ public class CombatController : MonoBehaviour
         playerController = GetComponent<PlayerController>();
         attackPoint = transform.Find("AttackPoint");
 
-
-        foreach (AttackScriptableObject aso in magicAttacksArsenal)
-        {
-
-        }
-        currentAttack = magicAttacksArsenal[0].attackName; //typhoon 
-        lastPhysicalAttack = currentAttack;
+        //hardcoded typhoon
+        currentMagicAttack = magicAttacksArsenal[0].attackName;
 
         magicMenu = FindObjectOfType<MagicMenu>();
-        magicMenu.gameObject.SetActive(false);
         spaceHoldTimer = 0;
 
     }
@@ -77,7 +68,6 @@ public class CombatController : MonoBehaviour
         if (!spaceHold && isSinglePress && !showingMagicMenu)
         {
             ToogleAtackingMode();
-            CombatChange?.Invoke(attackStance);
         }
 
         isSinglePress = spaceHold; // record for next frame
@@ -90,6 +80,12 @@ public class CombatController : MonoBehaviour
             {
                 showingMagicMenu = true;
                 magicMenu.ToogleMagicMenu();
+            }
+            //For selecting magic
+            if (showingMagicMenu)
+            {
+                // if (angle <=
+
             }
         }
         else
@@ -114,25 +110,26 @@ public class CombatController : MonoBehaviour
 
         if (angle < 0.0f) angle += 360f;
 
-        //transform.localEulerAngles = new Vector3(0, 0, angle);
-
+        attackPoint.localEulerAngles = new Vector3(0, 0, angle);
         float xPos = Mathf.Cos(Mathf.Deg2Rad * angle) * distance;
         float yPos = Mathf.Sin(Mathf.Deg2Rad * angle) * distance;
 
-        attackPoint.localPosition = new Vector3(xPos, yPos, 0);
+        directionVector = new Vector3(xPos, yPos, 0);
+        attackPoint.localPosition = directionVector;
     }
 
-
-    public void Attack(string attack, float cosmic)
+    public void Attack()
     {
         if (attackStance == AttackType.Physical)
         {
-            // make more physical attacks
-            Instantiate(physicalAttack.prefab, attackPoint.position, Quaternion.Euler(new Vector3(0, 0, angle)));
+            // Make more physical attacks
+            // Short range long range
+            Instantiate(physicalAttack.prefab, attackPoint.position , Quaternion.Euler(new Vector3(0, 0, angle + 90)));  // +90 to rotate
             return;
         }
 
-        AttackScriptableObject aso = Array.Find(magicAttacksArsenal, attackInArsenal => attackInArsenal.attackName == attack);
+        //TODO make current magic attack a scriptable object
+        AttackScriptableObject aso = Array.Find(magicAttacksArsenal, attackInArsenal => attackInArsenal.attackName == currentMagicAttack);
 
         if (aso == null)
         {
@@ -140,21 +137,26 @@ public class CombatController : MonoBehaviour
             return;
         }
 
-        //Ways to instantiate magic
-
-        switch (attack)
+        if (playerController.currentCosmic >= aso.cosmicNeeded)
         {
-            case "Typhoon":
-                if (cosmic >= 10)
-                {
-                    playerController.TakeCosmic(10);
-                    Instantiate(aso.prefab, transform.position, transform.rotation);
-                }
-                break;
-            default:
-                break;
-        }
+            playerController.TakeCosmic(aso.cosmicNeeded);
 
+            switch (currentMagicAttack)
+            {
+                case "Typhoon":
+                    Instantiate(aso.prefab, transform.position, transform.rotation);
+                    break;
+                case "PushingWind":
+                    GameObject wind = Instantiate(aso.prefab, attackPoint.position, attackPoint.rotation);
+                    if (angle >= 90 && angle <= 270)
+                    {
+                        wind.GetComponent<SpriteRenderer>().flipY = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     public void ToogleAtackingMode()
@@ -164,16 +166,32 @@ public class CombatController : MonoBehaviour
             case AttackType.Physical:
                 {
                     attackStance = AttackType.Magical;
-                    currentAttack = lastMagicAttack;
                     break;
                 }
             case AttackType.Magical:
                 {
                     attackStance = AttackType.Physical;
-                    currentAttack = lastPhysicalAttack;
                     break;
                 }
             default: break; //Maybe dialogue or menu
         }
+        CombatChange?.Invoke(attackStance);
+    }
+
+    void currentMagicChange(string name)
+    {
+        currentMagicAttack = name;
+        attackStance = AttackType.Magical;
+        CombatChange?.Invoke(attackStance);
+    }
+
+    void OnEnable()
+    {
+        MagicMenu.MagicSelected += currentMagicChange;
+    }
+
+    void OnDisable()
+    {
+        MagicMenu.MagicSelected -= currentMagicChange;
     }
 }

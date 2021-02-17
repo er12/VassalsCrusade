@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: SlashSO
   m_EditorClassIdentifier: 
   attackName: Slash
-  prefab: {fileID: 1948791206314843645, guid: 63d10a7e21c9f7e428c6a635022301af, type: 3}
+  prefab: {fileID: 768077796099764309, guid: 1e190cc5be6a3624cbed8a622e3cc52b, type: 3}
   attackBehaviourTrigger: 0
+  cosmicNeeded: 0

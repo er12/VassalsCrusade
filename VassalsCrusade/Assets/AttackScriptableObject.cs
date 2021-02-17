@@ -21,4 +21,6 @@ public class AttackScriptableObject : ScriptableObject
 
     public AttackBehaviourTrigger attackBehaviourTrigger;
 
+    public float cosmicNeeded;
+
 }

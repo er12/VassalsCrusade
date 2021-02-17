@@ -15,3 +15,4 @@ MonoBehaviour:
   attackName: Typhoon
   prefab: {fileID: 6612888649748774510, guid: 0cbbc8c9ad4a3084ab31c74889b98a63, type: 3}
   attackBehaviourTrigger: 0
+  cosmicNeeded: 10

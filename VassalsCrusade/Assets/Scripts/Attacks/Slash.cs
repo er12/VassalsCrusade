@@ -7,14 +7,12 @@ public class Slash : MonoBehaviour
 {
     public float damage = 5f;
 
-    public LayerMask enemyLayer;
-
     //for fading effect
     SpriteShapeRenderer spriteShapeRenderer;
 
     void Start()
     {
-        spriteShapeRenderer = GetComponent<SpriteShapeRenderer>();
+        spriteShapeRenderer = transform.Find("SlashSprite").GetComponent<SpriteShapeRenderer>();
         StartCoroutine(FadeSlash());
     }
 

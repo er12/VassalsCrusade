@@ -37,14 +37,16 @@ public class PlayerAttackingState : PlayerBaseState
         player.animator.SetFloat("Mouse Vertical", posDif.y);
 
         //Play animation
-        combatController.Attack(combatController.currentAttack, player.currentCosmic);
+        combatController.Attack();
+
+        // In case animator bugs
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
 
     }
 
     public override void Update(PlayerController player)
     {
-
-        // TODO: maybe USE animations EVENTS to fix this , note it has 4 animations
         //Transition back to walking if not attacking 
         if (!player.animator.GetCurrentAnimatorStateInfo(0).IsName("Player_Attack"))
             player.TransitionToState(player.IdleState);

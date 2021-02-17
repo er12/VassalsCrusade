@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32359c123fe85a34aaeb27793b7062e5, type: 3}
+  m_Name: PushingWindSO
+  m_EditorClassIdentifier: 
+  attackName: PushingWind
+  prefab: {fileID: 4621474459739584551, guid: 4145534575f6cc549b27af6c04257bd2, type: 3}
+  attackBehaviourTrigger: 0
+  cosmicNeeded: 5
