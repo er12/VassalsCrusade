@@ -28,9 +28,11 @@ SpriteAtlas:
       allowAlphaSplitting: 0
       enableRotation: 1
       enableTightPacking: 1
+    secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
     - {fileID: 102900000, guid: 6c278577e03c71a4f96af989664073ee, type: 3}
+    totalSpriteSurfaceArea: 2997248
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
@@ -3305,5 +3307,6 @@ SpriteAtlas:
   - ZRPGRocks2_589
   - ZRPGRocks2_509
   - ZRPGcolors
+  m_RenderDataMap: {}
   m_Tag: MySprites
   m_IsVariant: 0

@@ -14,6 +14,7 @@ public class Slash : MonoBehaviour
     {
         spriteShapeRenderer = transform.Find("SlashSprite").GetComponent<SpriteShapeRenderer>();
         StartCoroutine(FadeSlash());
+        
     }
 
     void OnTriggerEnter2D(Collider2D col)

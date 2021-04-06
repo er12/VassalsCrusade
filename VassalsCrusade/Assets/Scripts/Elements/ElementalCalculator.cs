@@ -20,7 +20,7 @@ public static class ElementalCalculator
         {Element.Thunder, new Element[]{Element.Water, Element.Metal}},
         
         // These are ffective between each other to balance
-        {Element.Force,   new Element[]{ Element.Time, Element.Space, Element.Force}}, 
+        {Element.Force,   new Element[]{ Element.Time, Element.Space, Element.Force}},
         {Element.Time,    new Element[]{ Element.Time, Element.Space, Element.Force }},
         {Element.Space,   new Element[]{ Element.Time, Element.Space, Element.Force }},
     };
@@ -37,9 +37,12 @@ public static class ElementalCalculator
     };
 
     // TODO for objects 
-    public static Dictionary<Element, Element[]> makesGoodEffect = new Dictionary<Element, Element[]>();
-    public static Dictionary<Element, Element[]> makesBadEffect = new Dictionary<Element, Element[]>();   
- 
+    // public static Dictionary<Element, Element[]> makesGoodEffect = new Dictionary<Element, Element[]>();
+    public static Dictionary<Element, Element[]> noEffect = new Dictionary<Element, Element[]>
+    {
+        {Element.Air,     new Element[] { Element.Earth, Element.Metal }},
+    };
+
     public static float CalculateDamage(Element sourceElement, Element[] targetElements)
     {
         float damageMultiplier = 1f;

@@ -3,11 +3,9 @@ using UnityEngine;
 
 public enum AttackType
 {
-
     Physical,
     Magical,
     Status
-
 }
 
 public class CombatController : MonoBehaviour
